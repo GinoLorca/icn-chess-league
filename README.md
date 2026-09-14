@@ -9,24 +9,35 @@ embedded on impactcoachingnetwork.org via an iframe (see below).
 
 ## Updating the league
 
-Everything content-related lives in `index.html`, inside the `<script>`
-block, and is commented in place:
+**Standings and player data update themselves.** A scheduled GitHub Actions
+workflow (`.github/workflows/update-league-data.yml`) runs daily, fetches
+the same live source ICN's own site uses
+(`https://icnadmin.com/League2026.html` — the page
+`impactcoachingnetwork.org/icnchessleague` itself just wraps in an iframe),
+and regenerates `LEAGUE_DATA`/`ALL_PLAYERS` in `index.html` to match,
+committing and pushing only if something actually changed. GitHub Pages
+redeploys automatically from there. To run it on demand instead of waiting
+for the schedule: **Actions → Update league data → Run workflow**.
 
-- **`LEAGUE_DATA`** — each school's cumulative season score, by region
-  (Overall / Manhattan / Brooklyn) and competitive section (K–1, Primary,
-  Elementary). This is what changes after every Matchday.
-- **`ALL_PLAYERS`** — the flat list every player ranking is derived from.
-- **`SCHOOL_COLORS`** — each school's two team colors.
+The scraper is `scripts/update_league_data.py` — if ICN's source page ever
+changes its HTML structure, this is what needs updating (it'll fail loudly,
+aborting without touching `index.html`, rather than writing garbage data,
+if it parses zero schools or players).
+
+Everything else content-related lives in `index.html`, inside the
+`<script>` block, and is commented in place:
+
+- **`SCHOOL_COLORS`** — each school's two team colors. Filled in by hand
+  from official crest artwork; a school missing here just keeps a plain
+  bar/row.
 - **`SCHOOL_LOGOS`** — maps a school name to its crest file in `logos/`.
 
 To add a school's crest: drop an SVG into `logos/`, then add a line to
 `SCHOOL_LOGOS` pointing at it (`"School Name": "logos/school-name.svg"`).
 Any aspect ratio works — it's displayed in a fixed square box that centers
-and scales the art automatically.
-
-**To publish an update:** commit and push to `main`. GitHub Pages redeploys
-automatically, usually live within a minute — nothing else to touch, and
-the Squarespace page never needs to be re-edited.
+and scales the art automatically. New schools that appear in the live data
+with no color/logo entry yet just render with a plain row until someone
+adds one — nothing breaks.
 
 ## Local preview
 
