@@ -1,0 +1,1606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ICN Chess League Standings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #ffffff;
+    --bg-inset: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f4f3f0;
+    --ink: #161513;
+    --ink-dim: #57554e;
+    --ink-faint: #8c897f;
+    --line: rgba(22,21,19,0.2);
+    --line-soft: rgba(22,21,19,0.1);
+    --gold: #161513;
+    --gold-bright: #3a382f;
+    --gold-ink: #161513;
+    --shadow: 0 1px 2px rgba(20,20,20,0.05);
+    --silver: #8c897f;
+    --bronze: #c3c0b5;
+    --pos: #161513;
+    --neg: #6b6a63;
+    --accent-2: #161513;
+    --accent-2-bright: #3a382f;
+    color-scheme: light;
+  }
+
+  /* Dark mode is intentionally off — impactcoachingnetwork.org doesn't have one,
+     and this app matches that site's branding. The tokens stay below in
+     :root[data-theme="dark"] as ready-to-go infrastructure: to bring dark mode
+     back later, either uncomment this auto (system-preference) block, or add a
+     UI toggle that sets data-theme="dark" on <html> (that selector already works).
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #121212;
+      --bg-inset: #121212;
+      --surface: #1a1a1a;
+      --surface-2: #242422;
+      --ink: #f2f0ea;
+      --ink-dim: #b8b5ab;
+      --ink-faint: #86837a;
+      --line: rgba(242,240,234,0.2);
+      --line-soft: rgba(242,240,234,0.1);
+      --gold: #f2f0ea;
+      --gold-bright: #cfccc2;
+      --gold-ink: #f2f0ea;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4);
+      --silver: #a6a39a;
+      --bronze: #6e6c63;
+      --pos: #f2f0ea;
+      --neg: #9a978d;
+      --accent-2: #f2f0ea;
+      --accent-2-bright: #cfccc2;
+      color-scheme: dark;
+    }
+  }
+  */
+
+  :root[data-theme="dark"]{
+    --bg: #121212;
+    --bg-inset: #121212;
+    --surface: #1a1a1a;
+    --surface-2: #242422;
+    --ink: #f2f0ea;
+    --ink-dim: #b8b5ab;
+    --ink-faint: #86837a;
+    --line: rgba(242,240,234,0.2);
+    --line-soft: rgba(242,240,234,0.1);
+    --gold: #f2f0ea;
+    --gold-bright: #cfccc2;
+    --gold-ink: #f2f0ea;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4);
+    --silver: #a6a39a;
+    --bronze: #6e6c63;
+    --pos: #f2f0ea;
+    --neg: #9a978d;
+    --accent-2: #f2f0ea;
+    --accent-2-bright: #cfccc2;
+    color-scheme: dark;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ text-size-adjust: 100%; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "EB Garamond", Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection{ background: var(--gold); color: #1c1c22; }
+  a{ color: inherit; }
+  button{ font-family: inherit; }
+  .num{ font-family: "EB Garamond", Georgia, serif; font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+  h1,h2,h3{ font-family: "Libre Caslon Display", Georgia, serif; font-weight: 400; text-wrap: balance; margin: 0; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    position: relative;
+    background: var(--surface);
+    border-bottom: 1px solid var(--ink);
+  }
+  .masthead-inner{
+    position: relative;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 26px 28px 26px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand{ display:flex; align-items:center; gap:16px; }
+  .brand-mark{
+    width: 190px; height: 190px;
+    display:flex; align-items:center; justify-content:center;
+    flex: none;
+  }
+  .brand-mark img{ width:100%; height:100%; object-fit: contain; display:block; }
+  .brand-text .eyebrow{
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .brand-text h1{
+    font-family: "Libre Caslon Text", Georgia, serif;
+    font-size: clamp(24px, 4vw, 34px);
+    font-weight: 700;
+    line-height: 1.08;
+  }
+  .season-chip{
+    display:flex; flex-direction:column; align-items:flex-end; gap:6px;
+    font-size: 15px;
+    color: var(--ink-dim);
+    text-align: right;
+  }
+  .season-chip .season-label{
+    font-family: "EB Garamond", Georgia, serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border: 1px solid var(--ink);
+    background: var(--surface);
+  }
+
+  .intro{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 22px 28px 0;
+    display:grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 780px){ .intro{ grid-template-columns: 1fr; } }
+  .intro p{
+    margin:0;
+    max-width: 62ch;
+    color: var(--ink-dim);
+    font-size: 17.5px;
+    line-height: 1.6;
+  }
+  .intro-legend{
+    display:flex; flex-wrap:wrap; gap: 10px 18px;
+    align-items:center;
+    font-size: 15px;
+    color: var(--ink-faint);
+  }
+  .intro-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend-dot{ width:9px; height:9px; border-radius:2px; display:inline-block; flex:none; }
+  .legend-line{ width:14px; height:0; border-top:1px dashed var(--gold); display:inline-block; flex:none; }
+
+  /* ---------- Layout ---------- */
+  .page{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 28px 80px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 26px;
+    align-items: start;
+  }
+  @media (max-width: 900px){
+    .page{ grid-template-columns: 1fr; }
+  }
+  /* Grid items default to a content-based auto min-width, so a wide
+     child (like the grade tab bar below, six buttons wide) can force
+     this whole column -- and the page -- wider than the viewport
+     instead of scrolling within its own overflow-x:auto. min-width:0
+     lets it actually shrink to the grid track and scroll internally. */
+  .page > section,
+  .page > aside.rail{
+    min-width: 0;
+  }
+
+  /* ---------- View toggle ---------- */
+  .view-toggle{
+    display:inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--ink);
+    padding: 0;
+    margin-bottom: 22px;
+  }
+  .view-toggle button{
+    border:none; cursor:pointer;
+    background: transparent;
+    color: var(--ink);
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: "EB Garamond", Georgia, serif;
+    transition: background .15s ease, color .15s ease;
+  }
+  .view-toggle button + button{ border-left: 1px solid var(--ink); }
+  .view-toggle button:hover{ background: var(--surface-2); }
+  .view-toggle button.active{ background: var(--ink); color: var(--bg); }
+  .view-toggle button.active:hover{ background: var(--ink); }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .tabs.regions{ margin-bottom: 10px; }
+  .tabs.divisions{ margin-bottom: 18px; }
+  .tab{
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--ink);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 9px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color .15s ease, background .15s ease;
+  }
+  .tab + .tab{ border-left: none; }
+  .tab:hover{ background: var(--surface-2); }
+  .tab.active{
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .tab.active:hover{ background: var(--ink); }
+  .tab.small{
+    padding: 6px 14px;
+    font-size: 13.5px;
+  }
+
+  /* ---------- Standings card ---------- */
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--ink);
+    overflow: hidden;
+  }
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 12px;
+    padding: 14px 16px 14px 20px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .card-head h2{ font-size: 24px; font-weight: 600; }
+  .card-head .sub{ font-size: 15px; color: var(--ink-faint); white-space:nowrap; }
+  .card-head-right{ display:flex; align-items:center; gap:10px; flex:none; }
+  .board-crest{ display:flex; flex:none; }
+  .board-crest svg{ display:block; width:38px; height:38px; }
+
+  .ladder-head, .ladder-row{
+    display: grid;
+    grid-template-columns: 54px minmax(150px,1fr) minmax(90px, 150px) 92px 84px 112px;
+    align-items: center;
+    gap: 14px;
+    padding: 0 20px;
+  }
+  .ladder-head{
+    padding-top: 10px; padding-bottom: 10px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+  }
+  .ladder-head span:nth-child(4),
+  .ladder-row .val{ text-align: right; }
+  .ladder-head span:nth-child(5),
+  .ladder-row .trend{ text-align: right; }
+  .ladder-head span:nth-child(6),
+  .ladder-row .behind{ text-align: right; }
+
+  .ladder-body .ladder-row{
+    padding-top: 11px; padding-bottom: 11px;
+    border-bottom: 1px solid var(--line-soft);
+    transition: background .12s ease;
+  }
+  .ladder-body .ladder-row:last-child{ border-bottom: none; }
+  .ladder-body .ladder-row:hover{ background: var(--surface-2); }
+  .ladder-body .ladder-row.leader{ box-shadow: inset 3px 0 0 var(--gold); }
+  .ladder-body .ladder-row{ cursor: pointer; }
+  .ladder-body .ladder-row:focus-visible{ outline: 2px solid var(--gold); outline-offset: -2px; }
+  .ladder-body .ladder-row.expanded{ background: var(--surface-2); }
+
+  .rank-cell{ font-family:"EB Garamond", Georgia, serif; }
+  .medal{
+    position: relative;
+    overflow: hidden;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size: 13.5px; font-weight: 700;
+    font-family: "EB Garamond", Georgia, serif;
+    box-shadow: inset 0 0 0 1px rgba(20,20,20,0.25);
+  }
+  .medal.g{ background: linear-gradient(135deg, #f9e28c, #d4a72c 55%, #b3861c); color: #4a3300; }
+  .medal.s{ background: linear-gradient(135deg, #f4f4f2, #b9bcc0 55%, #93969b); color: #2a2a2f; }
+  .medal.b{ background: linear-gradient(135deg, #e6b17d, #ad6a35 55%, #8a4f24); color: #34190a; }
+  .medal::after{
+    content: "";
+    position: absolute;
+    top: -20%; left: -140%;
+    width: 55%; height: 140%;
+    background: linear-gradient(115deg, transparent, rgba(255,255,255,0.9), transparent);
+    transform: skewX(-20deg);
+  }
+  @keyframes medalShine{
+    from{ left: -140%; }
+    to{ left: 140%; }
+  }
+  .medal:hover::after,
+  .medal.shine::after{
+    animation: medalShine 0.55s ease;
+  }
+  .rank-plain{ color: var(--ink-faint); }
+
+  .school-cell{ display:flex; align-items:center; gap:9px; min-width:0; }
+  .team-swatch{
+    width: 22px; height: 16px;
+    border: 1px solid var(--ink);
+    flex: none;
+    display:inline-block;
+  }
+  .team-logo{
+    width: 24px; height: 24px;
+    flex: none;
+    display:inline-flex;
+    align-items:center; justify-content:center;
+    overflow: hidden;
+  }
+  .team-logo img{
+    width: 100%; height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .chevron{
+    flex: none;
+    width: 19px; text-align:center;
+    font-size: 12px;
+    color: var(--ink-faint);
+    transition: transform .15s ease;
+  }
+  .ladder-row.expanded .chevron{ transform: rotate(90deg); color: var(--gold-ink); }
+  :root[data-theme="dark"] .ladder-row.expanded .chevron{ color: var(--gold); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .ladder-row.expanded .chevron{ color: var(--gold); } }
+  .school-name{ font-weight: 600; font-size: 17px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .trend{ font-family:"EB Garamond", Georgia, serif; font-size: 14px; font-weight:600; white-space:nowrap; }
+  .trend.up{ color: var(--pos); }
+  .trend.down{ color: var(--neg); }
+  .trend.flat{ color: var(--ink-faint); }
+
+  .player-panel{
+    padding: 4px 20px 18px 74px;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--surface-2);
+  }
+  .player-panel-head{
+    font-size: 12.5px; letter-spacing:0.08em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 700;
+    padding: 10px 0 8px;
+  }
+  .player-row{
+    display:flex; align-items:center; gap: 12px;
+    padding: 6px 0;
+    border-top: 1px solid var(--line-soft);
+    font-size: 15.5px;
+  }
+  .player-row:first-of-type{ border-top: none; }
+  .player-rank{ width: 16px; color: var(--ink-faint); font-family:"EB Garamond", Georgia, serif; font-size:14px; flex:none; }
+  .player-name{ flex:1; font-weight: 600; }
+  .player-grade{ font-size: 12.5px; color: var(--ink-faint); font-family:"EB Garamond", Georgia, serif; flex:none; }
+  .player-rating{ font-family:"EB Garamond", Georgia, serif; font-weight:700; color: var(--gold-ink); font-size: 15.5px; width: 44px; text-align:right; }
+  :root[data-theme="dark"] .player-rating{ color: var(--gold); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .player-rating{ color: var(--gold); } }
+  :root[data-theme="dark"] .player-rating{ color: var(--gold); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .player-rating{ color: var(--gold); } }
+  .player-empty{ font-size: 15px; color: var(--ink-dim); padding: 4px 0 12px; line-height:1.5; }
+
+  .bar-track{
+    height: 6px;
+    background: var(--line-soft);
+    overflow: hidden;
+  }
+  .bar-fill{ display:block; height:100%; background: var(--ink); }
+
+  .val{ font-weight: 700; font-family:"EB Garamond", Georgia, serif; color: var(--gold-ink); font-size: 16.5px; }
+  :root[data-theme="dark"] .val{ color: var(--gold); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .val{ color: var(--gold); } }
+
+  .behind{ font-family:"EB Garamond", Georgia, serif; font-size: 14px; color: var(--ink-faint); }
+  .behind.is-leader{ color: var(--gold-ink); font-weight: 700; text-transform: uppercase; font-size: 12.5px; letter-spacing: 0.06em; }
+  :root[data-theme="dark"] .behind.is-leader{ color: var(--gold); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .behind.is-leader{ color: var(--gold); } }
+
+  .cutoff{
+    position: relative;
+    margin: 4px 20px;
+    border-top: 1px dashed color-mix(in srgb, var(--gold) 55%, transparent);
+  }
+  .cutoff span{
+    position: absolute; left: 0; top: -8px;
+    background: var(--surface);
+    padding: 0 8px 0 0;
+    font-size: 12px; letter-spacing:0.08em; text-transform: uppercase;
+    color: var(--gold-ink); font-weight: 700;
+  }
+  :root[data-theme="dark"] .cutoff span{ color: var(--gold); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .cutoff span{ color: var(--gold); } }
+
+  .card-foot{
+    padding: 12px 20px 16px;
+    font-size: 13.5px;
+    color: var(--ink-faint);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+
+  @media (max-width: 560px){
+    .ladder-head, .ladder-row{ grid-template-columns: 40px 1fr 86px; }
+    .ladder-head span:nth-child(3), .ladder-row .bar-track{ display:none; }
+    .ladder-head span:nth-child(5), .ladder-row .trend{ display:none; }
+    .ladder-head span:nth-child(6), .ladder-row .behind{ display:none; }
+    .player-panel{ padding-left: 26px; }
+  }
+
+  /* ---------- Player rankings (plist) ---------- */
+  .ladder-head.plist-head, .ladder-row.plist-row{
+    grid-template-columns: 54px 1fr 105px 112px;
+  }
+  .ladder-head.plist-head span:nth-child(3){ text-align:right; }
+  .ladder-row.plist-row .val{ text-align:right; }
+  .player-cell{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+  .player-cell .school-sub{
+    font-size: 13.5px; color: var(--ink-faint); font-weight: 400;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  @media (max-width: 560px){
+    .ladder-head.plist-head, .ladder-row.plist-row{ grid-template-columns: 40px 1fr 86px; }
+    .ladder-head.plist-head span:nth-child(4), .ladder-row.plist-row .behind{ display:none; }
+  }
+
+  /* ---------- Player-panel grade filter ---------- */
+  .filter-chips{ display:flex; flex-wrap:wrap; gap:6px; padding: 10px 0 4px; }
+  .filter-chip{
+    border: 1px solid var(--ink);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: "EB Garamond", Georgia, serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 4px 11px;
+    cursor: pointer;
+  }
+  .filter-chip:hover{ background: var(--surface-2); }
+  .filter-chip.active{ background: var(--ink); color: var(--bg); }
+  .filter-chip.active:hover{ background: var(--ink); }
+
+  /* ---------- Sidebar ---------- */
+  .rail{ display:flex; flex-direction:column; gap: 18px; }
+  .rail .card-head h2{ font-size: 19px; }
+
+  .leaders{ padding: 6px 8px 14px; display:flex; flex-direction:column; gap:2px; }
+  .leader-row{
+    display:grid; grid-template-columns: 92px 1fr auto; align-items:center; gap:10px;
+    padding: 10px 12px;
+  }
+  .leader-row:hover{ background: var(--surface-2); }
+  .leader-row .division-tag{
+    font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 700;
+    white-space: nowrap;
+  }
+  .leader-row .lb-name{ flex:1; font-size: 16px; font-weight: 600; min-width:0; }
+  .leader-row .lb-name .lb-sub{ display:block; font-weight:400; font-size: 13px; color: var(--ink-faint); }
+  .leader-row .lb-pts{ font-family:"EB Garamond", Georgia, serif; font-weight:700; color: var(--gold-ink); font-size: 15.5px; }
+  :root[data-theme="dark"] .leader-row .lb-pts{ color: var(--gold); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .leader-row .lb-pts{ color: var(--gold); } }
+
+  .structure-card{ padding: 16px 18px 18px; }
+  .structure-list{ list-style:none; margin: 10px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .structure-list li{ font-size: 15px; color: var(--ink-dim); display:flex; gap:10px; }
+  .structure-list b{ color: var(--ink); font-weight:700; min-width: 104px; flex:none; }
+
+  footer{
+    max-width: 1180px; margin: 0 auto; padding: 0 28px 50px;
+    color: var(--ink-faint); font-size: 13.5px;
+  }
+
+  /* ---------- Division crests ---------- */
+  .badge-section{ border-top: 1px solid var(--ink); background: var(--surface-2); }
+  .badge-section-inner{ max-width: 1180px; margin: 0 auto; padding: 40px 28px 50px; }
+  .badge-section-head{ max-width: 62ch; margin-bottom: 26px; }
+  .badge-section-head h2{ font-size: 26px; font-weight: 400; }
+  .badge-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+  }
+  .badge-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 18px 14px 16px;
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+  }
+  .badge-card svg{ width: 100%; height: auto; max-width: 200px; }
+  .badge-caption{ text-align:center; }
+  .badge-caption .badge-borough{
+    display:block; font-size: 12.5px; letter-spacing:0.08em; text-transform:uppercase;
+    font-weight:700; color: var(--ink-faint);
+  }
+  .badge-caption .badge-division{
+    display:block; font-family:"Libre Caslon Display", Georgia, serif; font-size: 19px; font-weight:600; color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <div class="brand-mark"><img src="data:image/png;base64,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" alt="Impact Coaching Network logo" width="270" height="272"></div>
+      <div class="brand-text">
+        <p class="eyebrow">Impact Coaching Network</p>
+        <h1>ICN Chess League Standings</h1>
+      </div>
+    </div>
+    <div class="season-chip">
+      <span class="season-label" id="season-label">Season Points Ladder</span>
+    </div>
+  </div>
+  <div class="intro">
+    <p>Every ICN partner school competes in a season-long points ladder, split by borough and by grade division &mdash; same shape as the pros: conferences, standings, and a scoreboard everyone can watch climb.</p>
+    <div class="intro-legend">
+      <span><span class="legend-dot" style="background:var(--gold)"></span>Division leader</span>
+      <span><span class="legend-line"></span>Top 10 cutoff</span>
+      <span style="color:var(--pos)">&#9650; Up this week</span>
+      <span style="color:var(--neg)">&#9660; Down this week</span>
+      <span>Click a school for its top 5 players</span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section>
+    <nav class="view-toggle" id="view-toggle">
+      <button data-view="teams">Team Standings</button>
+      <button data-view="players">Player Rankings</button>
+    </nav>
+
+    <div id="team-view">
+      <nav class="tabs regions" id="region-tabs"></nav>
+      <nav class="tabs divisions" id="division-tabs"></nav>
+      <div class="card">
+        <div class="card-head">
+          <h2 id="board-title">Region &mdash; Division</h2>
+          <div class="card-head-right">
+            <span class="sub" id="board-sub"></span>
+            <span class="board-crest" id="board-crest"></span>
+          </div>
+        </div>
+        <div class="ladder-head">
+          <span>#</span>
+          <span>School</span>
+          <span>Score</span>
+          <span>Pts</span>
+          <span>Trend</span>
+          <span>Behind</span>
+        </div>
+        <div class="ladder-body" id="ladder-body"></div>
+        <div class="card-foot">
+          <span id="card-foot-left">Ranked by season points</span>
+          <span id="card-foot-right"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="player-view" style="display:none">
+      <nav class="tabs divisions" id="grade-tabs"></nav>
+      <div class="card">
+        <div class="card-head">
+          <h2 id="player-board-title">Grade &mdash; Top 50</h2>
+          <span class="sub" id="player-board-sub"></span>
+        </div>
+        <div class="ladder-head plist-head">
+          <span>#</span>
+          <span>Player</span>
+          <span>Rating</span>
+          <span>Behind</span>
+        </div>
+        <div class="ladder-body" id="player-body"></div>
+        <div class="card-foot">
+          <span>Ranked by USCF rating</span>
+          <span>ICN top 50, Aug 2026</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="rail">
+    <div class="card" id="leaders-teams-card">
+      <div class="card-head"><h2>Section Leaders</h2></div>
+      <div class="leaders" id="leaders"></div>
+    </div>
+
+    <div class="card" id="leaders-players-card" style="display:none">
+      <div class="card-head"><h2>Grade Leaders</h2></div>
+      <div class="leaders" id="grade-leaders"></div>
+    </div>
+
+    <div class="card structure-card">
+      <div class="card-head" style="border:none; padding-bottom:0;"><h2>How It Works</h2></div>
+      <ul class="structure-list">
+        <li><b>Conference</b> Overall (leaguewide) or a conference &mdash; Manhattan, Brooklyn.</li>
+        <li><b>Section</b> A competitive section: K&ndash;1, Primary (K&ndash;3), or Elementary (K&ndash;5) &mdash; eligibility ceilings, not exclusive grade buckets.</li>
+        <li><b>School</b> An ICN partner school competing as a team.</li>
+        <li><b>League Points</b> Awarded by Matchday finish in that section (1st = 10, 2nd = 8, 3rd = 6, down to 8th+ = 1) and added up across the season &mdash; not the raw chess score from a single Matchday.</li>
+        <li><b>Trend</b> Change since the last Matchday's standings.</li>
+        <li><b>Top 5 / Top 50</b> Click a school for its top 5 players, or switch to Player Rankings for every grade's top 50 by USCF rating.</li>
+      </ul>
+    </div>
+  </aside>
+</main>
+
+<section class="badge-section">
+  <div class="badge-section-inner">
+    <div class="badge-section-head">
+      <h2>Division Crests</h2>
+    </div>
+    <div class="badge-grid" id="badge-grid"></div>
+  </div>
+</section>
+
+<footer>ICN Chess League &middot; a standings board for Impact Coaching Network&rsquo;s after-school chess programs.</footer>
+
+<script>
+  /* ============================================================
+     SCHOOL_COLORS — each school's two official team colors,
+     [primary, secondary], sourced from the school's official crest
+     artwork, used to tint its score bar and a small swatch next to
+     its name. A school missing here just keeps the plain black bar.
+     Add more by pushing a ["#hex","#hex"] pair keyed by the exact
+     school name used in LEAGUE_DATA.
+     ============================================================ */
+  const SCHOOL_COLORS = {
+    "A-S":                  ["#2a4bd7", "#c9a227"],
+    "BASIS-B":              ["#111111", "#c31f2d"],
+    "Brooklyn Prospect IES":["#1b4332", "#ffffff"],
+    "BSI":                  ["#2a4bd7", "#ffffff"],
+    "Nest+M":               ["#111111", "#ffffff"],
+    "PS 3":                 ["#111111", "#ffffff"],
+    "PS 10":                ["#c31f2d", "#ffffff"],
+    "PS 11":                ["#2a4bd7", "#f5c518"],
+    "PS 111":               ["#1f7a3d", "#ffffff"],
+    "PS 116":               ["#2a4bd7", "#ffffff"],
+    "PS 118":               ["#800000", "#ffffff"],
+    "PS 124":               ["#c31f2d", "#111111"],
+    "PS 130":               ["#f5c518", "#2a4bd7"],
+    "PS 130M":              ["#800000", "#f5c518"],
+    "PS 166":               ["#152a54", "#ffffff"],
+    "PS 184M":              ["#f5c518", "#c31f2d"],
+    "PS 198":               ["#7ec8e3", "#f5c518"],
+    "PS 20":                ["#800000", "#ffffff"],
+    "PS 230":               ["#111111", "#f5c518"],
+    "PS 281":               ["#7ec8e3", "#111111"],
+    "PS 282":               ["#2a4bd7", "#d9631e"],
+    "PS 290":               ["#111111", "#ffffff"],
+    "PS 31":                ["#8c8f93", "#ffffff"],
+    "PS 32":                ["#1fa2a6", "#f5c518"],
+    "PS 33":                ["#d9631e", "#111111"],
+    "PS 333":               ["#111111", "#ffffff"],
+    "PS 34":                ["#d9631e", "#152a54"],
+    "PS 340":               ["#1f7a3d", "#111111"],
+    "PS 39":                ["#1f7a3d", "#ffffff"],
+    "PS 40":                ["#c31f2d", "#ffffff"],
+    "PS 527":               ["#8c8f93", "#111111"],
+    "PS 59":                ["#152a54", "#f5c518"],
+    "PS 77":                ["#152a54", "#f5c518"],
+    "PS 889":               ["#5b2a86", "#8c8f93"],
+    "Town School":          ["#5b6b8c", "#ffffff"]
+  };
+
+  /* ============================================================
+     SCHOOL_LOGOS — each school's official crest, keyed by the exact
+     school name used in LEAGUE_DATA, pointing at an SVG in
+     logos/. Displayed at a fixed 24x24 with
+     object-fit:contain (see .team-logo), so wide, tall, or square
+     source art all sit centered and undistorted next to the school
+     name. A school missing here just keeps the plain color swatch
+     (or a blank space if it has no colors either) — add an entry
+     once that school's crest file exists in logos/.
+     ============================================================ */
+  const SCHOOL_LOGOS = {
+    "A-S":                  "logos/a-s.svg",
+    "BASIS-B":              "logos/basis-b.svg",
+    "Brooklyn Prospect IES":"logos/brooklyn-prospect-ies.svg",
+    "BSI":                  "logos/bsi.svg",
+    "Nest+M":               "logos/nest-m.svg",
+    "PS 3":                 "logos/ps-3.svg",
+    "PS 10":                "logos/ps-10.svg",
+    "PS 11":                "logos/ps-11.svg",
+    "PS 111":               "logos/ps-111.svg",
+    "PS 116":               "logos/ps-116.svg",
+    "PS 118":               "logos/ps-118.svg",
+    "PS 124":               "logos/ps-124.svg",
+    "PS 130":               "logos/ps-130.svg",
+    "PS 130M":              "logos/ps-130m.svg",
+    "PS 166":               "logos/ps-166.svg",
+    "PS 184M":              "logos/ps-184m.svg",
+    "PS 198":               "logos/ps-198.svg",
+    "PS 20":                "logos/ps-20.svg",
+    "PS 230":               "logos/ps-230.svg",
+    "PS 281":               "logos/ps-281.svg",
+    "PS 282":               "logos/ps-282.svg",
+    "PS 290":               "logos/ps-290.svg",
+    "PS 31":                "logos/ps-31.svg",
+    "PS 32":                "logos/ps-32.svg",
+    "PS 33":                "logos/ps-33.svg",
+    "PS 333":               "logos/ps-333.svg",
+    "PS 34":                "logos/ps-34.svg",
+    "PS 340":               "logos/ps-340.svg",
+    "PS 39":                "logos/ps-39.svg",
+    "PS 40":                "logos/ps-40.svg",
+    "PS 527":               "logos/ps-527.svg",
+    "PS 59":                "logos/ps-59.svg",
+    "PS 77":                "logos/ps-77.svg",
+    "PS 889":               "logos/ps-889.svg",
+    "Town School":          "logos/town-school.svg"
+  };
+
+  /* ============================================================
+     LEAGUE_DATA — each region (Overall + boroughs) holds three grade
+     divisions (k1, primary, elementary). Each entry is a school's
+     cumulative season score. Add a region by adding a key here; add
+     a school by pushing a { name, points } object into a division.
+     ============================================================ */
+  const LEAGUE_DATA = {
+    regions: [
+      {
+        key: "overall", label: "Overall",
+        divisions: {
+          k1: [
+            { name:"Nest+M", points:758 }, { name:"PS 166", points:651 }, { name:"PS 11", points:575 },
+            { name:"PS 290", points:533 }, { name:"PS 10", points:524 }, { name:"PS 77", points:481 },
+            { name:"PS 281", points:444 }, { name:"PS 59", points:409 }, { name:"PS 282", points:399 },
+            { name:"PS 118", points:352 }, { name:"PS 33", points:330 }, { name:"PS 40", points:297 },
+            { name:"PS 198", points:290 }, { name:"PS 124", points:289 }, { name:"PS 20", points:268 },
+            { name:"PS 889", points:254 }, { name:"PS 130M", points:224 }, { name:"A-S", points:210 },
+            { name:"PS 230", points:208 }, { name:"BASIS-B", points:201 }, { name:"PS 340", points:194 },
+            { name:"PS 31", points:149 }, { name:"PS 32", points:130 }, { name:"PS 184M", points:112 },
+            { name:"PS 3", points:111 }
+          ],
+          primary: [
+            { name:"PS 166", points:1346 }, { name:"PS 281", points:1266 }, { name:"PS 77", points:1216 },
+            { name:"Nest+M", points:1212 }, { name:"PS 198", points:1186 }, { name:"PS 130", points:1118 },
+            { name:"PS 11", points:1075 }, { name:"PS 59", points:1038 }, { name:"PS 33", points:1008 },
+            { name:"PS 118", points:990 }, { name:"PS 282", points:961 }, { name:"PS 10", points:941 },
+            { name:"PS 290", points:935 }, { name:"PS 31", points:870 }, { name:"PS 124", points:856 },
+            { name:"BSI", points:802 }, { name:"PS 32", points:790 }, { name:"PS 230", points:788 },
+            { name:"PS 20", points:754 }, { name:"PS 130M", points:713 }, { name:"PS 116", points:646 },
+            { name:"PS 40", points:644 }, { name:"PS 39", points:640 }, { name:"A-S", points:618 },
+            { name:"PS 527", points:607 }
+          ],
+          elementary: [
+            { name:"PS 130", points:1575 }, { name:"PS 77", points:1567 }, { name:"PS 198", points:1560 },
+            { name:"PS 59", points:1551 }, { name:"PS 130M", points:1471 }, { name:"PS 33", points:1457 },
+            { name:"Nest+M", points:1437 }, { name:"PS 10", points:1390 }, { name:"PS 166", points:1369 },
+            { name:"PS 527", points:1337 }, { name:"PS 11", points:1301 }, { name:"PS 39", points:1291 },
+            { name:"PS 290", points:1217 }, { name:"PS 281", points:1177 }, { name:"PS 32", points:1170 },
+            { name:"PS 230", points:1156 }, { name:"PS 20", points:1126 }, { name:"PS 31", points:1092 },
+            { name:"PS 282", points:1067 }, { name:"PS 124", points:1034 }, { name:"PS 40", points:1016 },
+            { name:"BSI", points:980 }, { name:"A-S", points:881 }, { name:"PS 111", points:872 },
+            { name:"Brooklyn Prospect IES", points:863 }
+          ]
+        }
+      },
+      {
+        key: "manhattan", label: "Manhattan",
+        divisions: {
+          k1: [
+            { name:"Nest+M", points:758 }, { name:"PS 166", points:651 }, { name:"PS 11", points:575 },
+            { name:"PS 290", points:533 }, { name:"PS 77", points:481 }, { name:"PS 281", points:444 },
+            { name:"PS 59", points:409 }, { name:"PS 33", points:330 }, { name:"Saddle River Day", points:299 },
+            { name:"PS 40", points:297 }
+          ],
+          primary: [
+            { name:"PS 166", points:1346 }, { name:"PS 281", points:1266 }, { name:"PS 77", points:1216 },
+            { name:"Nest+M", points:1212 }, { name:"PS 198", points:1186 }, { name:"PS 11", points:1075 },
+            { name:"PS 59", points:1038 }, { name:"PS 33", points:1008 }, { name:"PS 290", points:935 },
+            { name:"PS 124", points:856 }
+          ],
+          elementary: [
+            { name:"PS 77", points:1567 }, { name:"PS 198", points:1560 }, { name:"PS 59", points:1551 },
+            { name:"PS 130M", points:1471 }, { name:"PS 33", points:1457 }, { name:"Nest+M", points:1437 },
+            { name:"PS 166", points:1369 }, { name:"PS 527", points:1337 }, { name:"PS 11", points:1301 },
+            { name:"PS 290", points:1217 }
+          ]
+        }
+      },
+      {
+        key: "brooklyn", label: "Brooklyn",
+        divisions: {
+          k1: [
+            { name:"PS 10", points:524 }, { name:"PS 282", points:399 }, { name:"PS 118", points:352 },
+            { name:"Saddle River Day", points:299 }, { name:"PS 20", points:268 }, { name:"PS 889", points:254 },
+            { name:"PS 230", points:208 }, { name:"BASIS-B", points:201 }, { name:"PS 31", points:149 },
+            { name:"PS 32", points:130 }
+          ],
+          primary: [
+            { name:"PS 130", points:1118 }, { name:"PS 118", points:990 }, { name:"PS 282", points:961 },
+            { name:"PS 10", points:941 }, { name:"PS 31", points:870 }, { name:"BSI", points:802 },
+            { name:"PS 32", points:790 }, { name:"PS 230", points:788 }, { name:"PS 20", points:754 },
+            { name:"PS 39", points:640 }
+          ],
+          elementary: [
+            { name:"PS 130", points:1575 }, { name:"PS 10", points:1390 }, { name:"PS 39", points:1291 },
+            { name:"PS 32", points:1170 }, { name:"PS 230", points:1156 }, { name:"PS 20", points:1126 },
+            { name:"PS 31", points:1092 }, { name:"PS 282", points:1067 }, { name:"BSI", points:980 },
+            { name:"Brooklyn Prospect IES", points:863 }
+          ]
+        }
+      }
+    ]
+  };
+
+  /* ============================================================
+     DIVISIONS — the single source of truth for ICN's competitive
+     sections. label is the section name; shortLabel is the grade
+     range shown as a subtitle; eligibleGrades lists every grade
+     that section is open to (ICN's sections are eligibility
+     ceilings, not exclusive buckets — e.g. Primary is K-3, not just
+     grades 2-3, so a K-1 player's school standing here still counts
+     toward Primary). Change ICN's grade groupings by editing this
+     one object — nothing else needs to know the rule.
+     ============================================================ */
+  const DIVISIONS = [
+    { key: "k1", label: "K–1", shortLabel: "Grades K–1", eligibleGrades: ["K", "1"] },
+    { key: "primary", label: "Primary", shortLabel: "K–3", eligibleGrades: ["K", "1", "2", "3"] },
+    { key: "elementary", label: "Elementary", shortLabel: "K–5", eligibleGrades: ["K", "1", "2", "3", "4", "5"] }
+  ];
+
+  /* ============================================================
+     ALL_PLAYERS — every ICN top-50-by-grade player (Aug 2026 lists),
+     one flat array. PLAYERS_BY_SCHOOL and PLAYERS_BY_GRADE below are
+     both derived from this single list. Add a player by pushing
+     { name, rating, school, grade } onto ALL_PLAYERS; grade is one
+     of "K","1","2","3","4","5".
+     ============================================================ */
+  const ALL_PLAYERS = [
+    { name:"Charles Don", rating:1317, school:"Nest+M", grade:"K" },
+    { name:"Edward Hong", rating:875, school:"PS 166", grade:"K" },
+    { name:"Hazel Su", rating:813, school:"BASIS-B", grade:"K" },
+    { name:"Wesley Wang", rating:768, school:"Nest+M", grade:"K" },
+    { name:"Maksim Kobrinsky", rating:727, school:"PS 230", grade:"K" },
+    { name:"Ren Du-Liang", rating:716, school:"PS 290", grade:"K" },
+    { name:"Mohui Jiang", rating:685, school:"A-S", grade:"K" },
+    { name:"Kai Tang", rating:680, school:"PS 11", grade:"K" },
+    { name:"Owen Chen", rating:666, school:"PS 10", grade:"K" },
+    { name:"Isabelle Pomeranc", rating:652, school:"PS 282", grade:"K" },
+    { name:"William Lin", rating:647, school:"PS 59", grade:"K" },
+    { name:"Cooper Englund", rating:647, school:"PS 166", grade:"K" },
+    { name:"Aviv Horev", rating:640, school:"PS 40", grade:"K" },
+    { name:"Parker Downing", rating:626, school:"PS 11", grade:"K" },
+    { name:"Jordan Cetron", rating:614, school:"PS 281", grade:"K" },
+    { name:"Eloise Charbal", rating:603, school:"PS 198", grade:"K" },
+    { name:"Lilianna Tenorio", rating:598, school:"Nest+M", grade:"K" },
+    { name:"Dylan Wu", rating:589, school:"PS 11", grade:"K" },
+    { name:"Logan Hong", rating:585, school:"PS 166", grade:"K" },
+    { name:"Luca Fusco", rating:573, school:"PS 290", grade:"K" },
+    { name:"Arco Vidiksis", rating:572, school:"PS 10", grade:"K" },
+    { name:"Niam Parmar", rating:565, school:"Saddle River Day", grade:"K" },
+    { name:"Owen Luo", rating:552, school:"PS 77", grade:"K" },
+    { name:"Calder Surtees", rating:538, school:"PS 33", grade:"K" },
+    { name:"Rachel Young", rating:537, school:"PS 77", grade:"K" },
+    { name:"Eli Pildis", rating:511, school:"PS 59", grade:"K" },
+    { name:"Cora Nightingale", rating:502, school:"PS 166", grade:"K" },
+    { name:"Kenzo Waters", rating:470, school:"PS 32", grade:"K" },
+    { name:"Reima Haniu", rating:468, school:"PS 281", grade:"K" },
+    { name:"Remy Surman", rating:463, school:"PS 166", grade:"K" },
+    { name:"Fionnuala Verdi", rating:462, school:"PS 10", grade:"K" },
+    { name:"Zohar Rudis", rating:457, school:"PS 282", grade:"K" },
+    { name:"Amelia Ye", rating:456, school:"PS 290", grade:"K" },
+    { name:"Lucas Chen", rating:452, school:"PS 166", grade:"K" },
+    { name:"Noam Sagi", rating:445, school:"PS 166", grade:"K" },
+    { name:"Hunter Zhou", rating:438, school:"PS 77", grade:"K" },
+    { name:"Ansel Fair", rating:438, school:"PS 118", grade:"K" },
+    { name:"Yoomi Yoon-Winawer", rating:435, school:"PS 11", grade:"K" },
+    { name:"Geva Gilead", rating:426, school:"PS 889", grade:"K" },
+    { name:"Margot Trin", rating:422, school:"PS 124", grade:"K" },
+    { name:"Isabel Lau", rating:408, school:"PS 124", grade:"K" },
+    { name:"Jiho Chae", rating:405, school:"Norwood", grade:"K" },
+    { name:"Milo Casey", rating:404, school:"PS 10", grade:"K" },
+    { name:"Proxima Reed Rader", rating:394, school:"PS 20", grade:"K" },
+    { name:"Lucas Song", rating:387, school:"PS 290", grade:"K" },
+    { name:"Severin Dragovoja", rating:385, school:"PS 34", grade:"K" },
+    { name:"Neil Goel", rating:376, school:"PS 77", grade:"K" },
+    { name:"Ellis Kim", rating:372, school:"PS 77", grade:"K" },
+    { name:"Henry Shen", rating:372, school:"PS 77", grade:"K" },
+    { name:"Henry Eber", rating:369, school:"PS 281", grade:"K" },
+    { name:"Austin Schnitzer", rating:1403, school:"PS 59", grade:"1" },
+    { name:"Benjamin Frye", rating:1304, school:"PS 166", grade:"1" },
+    { name:"Levi Grossberg", rating:1274, school:"PS 282", grade:"1" },
+    { name:"Maddox Kretschman", rating:1269, school:"PS 118", grade:"1" },
+    { name:"Oliver Zhang", rating:1217, school:"PS 124", grade:"1" },
+    { name:"Logan Go", rating:1188, school:"PS 281", grade:"1" },
+    { name:"Yuvan Choudhury", rating:1177, school:"PS 166", grade:"1" },
+    { name:"Luca Falk", rating:1130, school:"PS 166", grade:"1" },
+    { name:"Fumikazu Abe", rating:1115, school:"PS 198", grade:"1" },
+    { name:"Ren Hirayama", rating:1111, school:"PS 198", grade:"1" },
+    { name:"Wyatt Lawson", rating:1097, school:"PS 11", grade:"1" },
+    { name:"William Qian", rating:1088, school:"PS 77", grade:"1" },
+    { name:"Lucas Flores", rating:1074, school:"PS 198", grade:"1" },
+    { name:"Liyana Dar", rating:1069, school:"PS 77", grade:"1" },
+    { name:"Theo Shao", rating:1068, school:"PS 77", grade:"1" },
+    { name:"Kaito Kemuriyama", rating:1018, school:"PS 281", grade:"1" },
+    { name:"Adam Atwa", rating:999, school:"PS 11", grade:"1" },
+    { name:"Yuica Nishioka", rating:995, school:"PS 77", grade:"1" },
+    { name:"Mia Vakhtangishvili", rating:984, school:"PS 198", grade:"1" },
+    { name:"Isla Miner", rating:983, school:"PS 130", grade:"1" },
+    { name:"Leonardo Chu", rating:954, school:"PS 290", grade:"1" },
+    { name:"Alessio Hendricks", rating:945, school:"PS 281", grade:"1" },
+    { name:"Eva Vakhtangishvili", rating:931, school:"PS 198", grade:"1" },
+    { name:"Rohan Shetty", rating:891, school:"PS 77", grade:"1" },
+    { name:"Takashi iizumi", rating:878, school:"PS 281", grade:"1" },
+    { name:"Mac Frantzis", rating:875, school:"PS 20", grade:"1" },
+    { name:"Tal Donaghy", rating:854, school:"PS 77", grade:"1" },
+    { name:"Atlas Srivastava", rating:852, school:"PS 33", grade:"1" },
+    { name:"Kai Kessler", rating:852, school:"PS 282", grade:"1" },
+    { name:"Reika Konuma", rating:850, school:"PS 198", grade:"1" },
+    { name:"Jacob Hoelscher", rating:844, school:"Nest+M", grade:"1" },
+    { name:"Jacob Audett", rating:842, school:"PS 282", grade:"1" },
+    { name:"Jamie Wang", rating:837, school:"PS 77", grade:"1" },
+    { name:"Rei Yamazaki", rating:832, school:"PS 198", grade:"1" },
+    { name:"Ronen Bikoff", rating:815, school:"PS 77", grade:"1" },
+    { name:"Jamie McNamara", rating:813, school:"PS 32", grade:"1" },
+    { name:"Jason Ham", rating:810, school:"Nest+M", grade:"1" },
+    { name:"Sebastian Mehtani", rating:786, school:"Nest+M", grade:"1" },
+    { name:"Olivia Nightingale", rating:776, school:"PS 166", grade:"1" },
+    { name:"Som Temby", rating:772, school:"PS 31", grade:"1" },
+    { name:"Devin Swan", rating:766, school:"A-S", grade:"1" },
+    { name:"Rhea Zhao", rating:759, school:"Nest+M", grade:"1" },
+    { name:"Jeremy Hou", rating:754, school:"PS 281", grade:"1" },
+    { name:"Kristen Oh", rating:740, school:"PS 527", grade:"1" },
+    { name:"Massimo Vietri", rating:735, school:"PS 290", grade:"1" },
+    { name:"Simone Dukhon", rating:718, school:"PS 59", grade:"1" },
+    { name:"Kieran Melgar", rating:718, school:"PS 20", grade:"1" },
+    { name:"Parker Chen", rating:716, school:"PS 33", grade:"1" },
+    { name:"Lynn Ashida", rating:708, school:"PS 77", grade:"1" },
+    { name:"Milos Fisher", rating:708, school:"PS 118", grade:"1" },
+    { name:"Matias Falk", rating:1591, school:"PS 166", grade:"2" },
+    { name:"Julian Cho", rating:1509, school:"Nest+M", grade:"2" },
+    { name:"Kieran McCullough", rating:1479, school:"PS 166", grade:"2" },
+    { name:"Yicheng Zhang", rating:1428, school:"PS 77", grade:"2" },
+    { name:"Benjamin Abramowitz", rating:1411, school:"PS 333", grade:"2" },
+    { name:"Lucas Ciraldo", rating:1329, school:"PS 281", grade:"2" },
+    { name:"Roi Choi", rating:1305, school:"PS 33", grade:"2" },
+    { name:"Elena Sengupta", rating:1305, school:"PS 198", grade:"2" },
+    { name:"Krish Reddy", rating:1296, school:"PS 281", grade:"2" },
+    { name:"Neel Dubey", rating:1285, school:"PS 77", grade:"2" },
+    { name:"Maverick Wang", rating:1274, school:"PS 281", grade:"2" },
+    { name:"Jio Park", rating:1242, school:"PS 10", grade:"2" },
+    { name:"Jacob Burkat", rating:1220, school:"Nest+M", grade:"2" },
+    { name:"Sam Ramsey", rating:1210, school:"PS 118", grade:"2" },
+    { name:"Devitt Begley", rating:1194, school:"PS 198", grade:"2" },
+    { name:"Miroslav Toth", rating:1179, school:"PS 130", grade:"2" },
+    { name:"Luke Lederman", rating:1156, school:"PS 77", grade:"2" },
+    { name:"Ramon Omer", rating:1155, school:"PS 281", grade:"2" },
+    { name:"Naomi Finkin", rating:1150, school:"PS 59", grade:"2" },
+    { name:"Athena Vitticore", rating:1150, school:"PS 130", grade:"2" },
+    { name:"William Zhu", rating:1143, school:"PS 281", grade:"2" },
+    { name:"Jae Kromidas", rating:1143, school:"PS 166", grade:"2" },
+    { name:"Tristan Lazaro", rating:1120, school:"PS 230", grade:"2" },
+    { name:"Rafael Mario Guevara-Ceja", rating:1110, school:"PS 130", grade:"2" },
+    { name:"Edward Song", rating:1095, school:"PS 290", grade:"2" },
+    { name:"Glenn Gooch-Raushenbush", rating:1094, school:"PS 11", grade:"2" },
+    { name:"Alex Kou", rating:1086, school:"Nest+M", grade:"2" },
+    { name:"Lorenzo Ciccia", rating:1082, school:"PS 166", grade:"2" },
+    { name:"Micah Rifkin", rating:1069, school:"PS 116", grade:"2" },
+    { name:"Brian Silverman", rating:1045, school:"PS 11", grade:"2" },
+    { name:"Lincoln Freeman", rating:1041, school:"Nest+M", grade:"2" },
+    { name:"Lue Lev-Talpaz", rating:1034, school:"PS 130", grade:"2" },
+    { name:"Connie Ye", rating:1028, school:"BSI", grade:"2" },
+    { name:"Adrian Gutierrez", rating:1015, school:"PS 230", grade:"2" },
+    { name:"Levi Micah Jean", rating:1008, school:"PS 32", grade:"2" },
+    { name:"Maxwell Steer", rating:973, school:"PS 31", grade:"2" },
+    { name:"Luc Denis Totouom Tangho", rating:971, school:"PS 166", grade:"2" },
+    { name:"Sienna Sartor", rating:967, school:"PS 198", grade:"2" },
+    { name:"McKenzie Ocupa", rating:966, school:"PS 111", grade:"2" },
+    { name:"Henry Wills", rating:956, school:"PS 31", grade:"2" },
+    { name:"Allison Lai", rating:937, school:"PS 77", grade:"2" },
+    { name:"Jaxson Vanderpoole", rating:936, school:"PS 11", grade:"2" },
+    { name:"Rohan Shukla", rating:936, school:"PS 130M", grade:"2" },
+    { name:"Marcus Lau", rating:932, school:"PS 124", grade:"2" },
+    { name:"Julian Wilson", rating:930, school:"PS 130", grade:"2" },
+    { name:"Theodore Cinquegrana", rating:926, school:"Nest+M", grade:"2" },
+    { name:"Adam Ali", rating:920, school:"PS 33", grade:"2" },
+    { name:"Daniel Tuohy", rating:908, school:"PS 31", grade:"2" },
+    { name:"Cary Boyle", rating:906, school:"PS 130", grade:"2" },
+    { name:"Ethan Lao", rating:901, school:"PS 290", grade:"2" },
+    { name:"Max Mulholland", rating:1949, school:"PS 198", grade:"3" },
+    { name:"Sebastian Goodrich", rating:1845, school:"PS 77", grade:"3" },
+    { name:"Harrison Moscona", rating:1766, school:"PS 59", grade:"3" },
+    { name:"Preston Liu", rating:1707, school:"PS 130M", grade:"3" },
+    { name:"Maximus Phillips", rating:1626, school:"PS 33", grade:"3" },
+    { name:"Jackson Liu", rating:1560, school:"PS 130M", grade:"3" },
+    { name:"Harrison Harsch", rating:1499, school:"PS 130", grade:"3" },
+    { name:"Halo Nomura", rating:1477, school:"PS 39", grade:"3" },
+    { name:"Sebastian Alanis", rating:1456, school:"PS 198", grade:"3" },
+    { name:"Lucas Rosenberg", rating:1411, school:"PS 198", grade:"3" },
+    { name:"Graham Shlisky", rating:1409, school:"PS 77", grade:"3" },
+    { name:"Evan Desai", rating:1403, school:"PS 198", grade:"3" },
+    { name:"Sidney Gitomer", rating:1368, school:"A-S", grade:"3" },
+    { name:"Samuel Ricca", rating:1358, school:"PS 889", grade:"3" },
+    { name:"Henry Mueller", rating:1332, school:"PS 130", grade:"3" },
+    { name:"Ioane Kilasonia", rating:1302, school:"PS 10", grade:"3" },
+    { name:"Andrew Li", rating:1300, school:"PS 11", grade:"3" },
+    { name:"Jacob King", rating:1299, school:"PS 130", grade:"3" },
+    { name:"Jordan Nguyen-Huynh", rating:1299, school:"PS 130M", grade:"3" },
+    { name:"Shanay Potti", rating:1288, school:"Nest+M", grade:"3" },
+    { name:"Raenav Bajpai-Sharan", rating:1288, school:"PS 527", grade:"3" },
+    { name:"Amerson Nicodemo", rating:1283, school:"Nest+M", grade:"3" },
+    { name:"Rami Padukone-Mitter", rating:1281, school:"PS 11", grade:"3" },
+    { name:"Theodore Lewis", rating:1272, school:"PS 11", grade:"3" },
+    { name:"Jayden Xu", rating:1268, school:"PS 130M", grade:"3" },
+    { name:"Jack Brodersen", rating:1225, school:"PS 59", grade:"3" },
+    { name:"Miller Mayo", rating:1219, school:"PS 10", grade:"3" },
+    { name:"Jonathan Wang", rating:1218, school:"PS 290", grade:"3" },
+    { name:"Ethan Metzer", rating:1210, school:"PS 11", grade:"3" },
+    { name:"Chloe Yip", rating:1205, school:"PS 11", grade:"3" },
+    { name:"Airi Mitobe", rating:1201, school:"PS 77", grade:"3" },
+    { name:"Ishaan Sharma", rating:1198, school:"PS 130", grade:"3" },
+    { name:"Asher Weintraub", rating:1186, school:"PS 118", grade:"3" },
+    { name:"Solaris Wang", rating:1169, school:"PS 130M", grade:"3" },
+    { name:"Celeste Shin", rating:1160, school:"PS 40", grade:"3" },
+    { name:"Lionel Bengtsen", rating:1151, school:"PS 184M", grade:"3" },
+    { name:"Caleb Chen", rating:1142, school:"PS 130M", grade:"3" },
+    { name:"Thomas Mischaikow", rating:1136, school:"PS 39", grade:"3" },
+    { name:"Eva Shang", rating:1133, school:"Nest+M", grade:"3" },
+    { name:"Owen Braun", rating:1126, school:"A-S", grade:"3" },
+    { name:"Logan Chow", rating:1124, school:"PS 124", grade:"3" },
+    { name:"Ashton Roth", rating:1120, school:"PS 281", grade:"3" },
+    { name:"Lucas Crutchfield", rating:1116, school:"PS 39", grade:"3" },
+    { name:"Evelyn Jones", rating:1115, school:"PS 130", grade:"3" },
+    { name:"Emile JONQUIERES", rating:1094, school:"PS 527", grade:"3" },
+    { name:"Dean Chiang", rating:1086, school:"Nest+M", grade:"3" },
+    { name:"George Cohen", rating:1071, school:"PS 10", grade:"3" },
+    { name:"Gabriel Weng", rating:1069, school:"BSI", grade:"3" },
+    { name:"Dylan Guenther", rating:1058, school:"BSI", grade:"3" },
+    { name:"Roni Bayram", rating:1050, school:"PS 31", grade:"3" },
+    { name:"Grayson Xiang", rating:2015, school:"PS 130", grade:"4" },
+    { name:"Milo Su", rating:1970, school:"BASIS-B", grade:"4" },
+    { name:"Oscar Finkin", rating:1793, school:"PS 59", grade:"4" },
+    { name:"Joseph Daniel Totouom Tangho", rating:1772, school:"PS 166", grade:"4" },
+    { name:"Brendan Seto", rating:1754, school:"PS 281", grade:"4" },
+    { name:"George Japharidze", rating:1671, school:"PS 10", grade:"4" },
+    { name:"Rohan Iyengar", rating:1670, school:"PS 33", grade:"4" },
+    { name:"Kirill McNaughton", rating:1647, school:"Nest+M", grade:"4" },
+    { name:"Hiroki Winter", rating:1609, school:"PS 527", grade:"4" },
+    { name:"Arman Alimbayev", rating:1568, school:"PS 39", grade:"4" },
+    { name:"August Noble", rating:1522, school:"PS 130", grade:"4" },
+    { name:"Aya Shapovalov", rating:1519, school:"PS 77", grade:"4" },
+    { name:"Rohan Dalal", rating:1511, school:"Town School", grade:"4" },
+    { name:"Phoebe Lasher", rating:1506, school:"PS 166", grade:"4" },
+    { name:"Basil Bouzalis", rating:1491, school:"PS 77", grade:"4" },
+    { name:"Weili Wen", rating:1484, school:"PS 77", grade:"4" },
+    { name:"David Azimov", rating:1482, school:"PS 230", grade:"4" },
+    { name:"Avery Van Arman", rating:1460, school:"Brooklyn Prospect IES", grade:"4" },
+    { name:"Alfred Cheung", rating:1454, school:"PS 10", grade:"4" },
+    { name:"Gabriel Young", rating:1452, school:"PS 32", grade:"4" },
+    { name:"Noah Valderrama", rating:1452, school:"PS 527", grade:"4" },
+    { name:"Tyler Sun", rating:1430, school:"PS 77", grade:"4" },
+    { name:"Jeremiah Dimoh", rating:1430, school:"PS 20", grade:"4" },
+    { name:"Emile Shah", rating:1423, school:"Nest+M", grade:"4" },
+    { name:"Edison Chen", rating:1421, school:"PS 59", grade:"4" },
+    { name:"Maximus Chesbro", rating:1386, school:"PS 31", grade:"4" },
+    { name:"Max Alvarez", rating:1383, school:"PS 32", grade:"4" },
+    { name:"Aidan Lin", rating:1374, school:"PS 77", grade:"4" },
+    { name:"Hanna Sengupta", rating:1370, school:"PS 198", grade:"4" },
+    { name:"Chloe Zheng", rating:1368, school:"PS 77", grade:"4" },
+    { name:"Michelle Kou", rating:1352, school:"Nest+M", grade:"4" },
+    { name:"Hudson Pistorino", rating:1352, school:"PS 290", grade:"4" },
+    { name:"Parsa Edalati", rating:1343, school:"PS 33", grade:"4" },
+    { name:"Theodore Meng", rating:1340, school:"PS 11", grade:"4" },
+    { name:"Shirina Tolibova", rating:1327, school:"PS 230", grade:"4" },
+    { name:"Yotam Hochstadt", rating:1326, school:"PS 40", grade:"4" },
+    { name:"Tai Hong", rating:1290, school:"Nest+M", grade:"4" },
+    { name:"Nico Karp", rating:1279, school:"PS 130", grade:"4" },
+    { name:"Victor Brunet", rating:1278, school:"PS 290", grade:"4" },
+    { name:"Nash del Rio", rating:1250, school:"PS 20", grade:"4" },
+    { name:"Mason Ramachandran", rating:1243, school:"PS 33", grade:"4" },
+    { name:"Christopher Maghi", rating:1240, school:"Brooklyn Prospect IES", grade:"4" },
+    { name:"Ashwath Anand", rating:1211, school:"PS 10", grade:"4" },
+    { name:"Ethan Lau", rating:1203, school:"PS 59", grade:"4" },
+    { name:"Ellis Goh", rating:1188, school:"PS 33", grade:"4" },
+    { name:"Trey Harris", rating:1172, school:"PS 282", grade:"4" },
+    { name:"Christopher Lam", rating:1155, school:"PS 130M", grade:"4" },
+    { name:"Garvey Orane", rating:1150, school:"PS 10", grade:"4" },
+    { name:"Lila Fugate", rating:1147, school:"PS 166", grade:"4" },
+    { name:"Eilidh Donaghy", rating:1127, school:"PS 111", grade:"4" },
+    { name:"Jack Boyer-Olson", rating:2101, school:"Nest+M", grade:"5" },
+    { name:"Adrian Sommerstein", rating:2009, school:"PS 130", grade:"5" },
+    { name:"Isaac Noah Lui", rating:1966, school:"PS 130M", grade:"5" },
+    { name:"Ethan Kim", rating:1884, school:"PS 77", grade:"5" },
+    { name:"Kai Waters", rating:1803, school:"PS 32", grade:"5" },
+    { name:"Seamus Brady", rating:1790, school:"PS 130", grade:"5" },
+    { name:"Noah Kaye", rating:1757, school:"PS 130", grade:"5" },
+    { name:"Lowell Begley", rating:1737, school:"PS 198", grade:"5" },
+    { name:"Ekam Anand", rating:1733, school:"PS 77", grade:"5" },
+    { name:"Lve Wang", rating:1731, school:"PS 281", grade:"5" },
+    { name:"Niklas Kelletshofer", rating:1661, school:"PS 198", grade:"5" },
+    { name:"Avery Goodrich", rating:1654, school:"PS 77", grade:"5" },
+    { name:"Leah Cai", rating:1654, school:"PS 130M", grade:"5" },
+    { name:"Reed Shlisky", rating:1641, school:"PS 77", grade:"5" },
+    { name:"Alexander Rosenberg", rating:1572, school:"PS 33", grade:"5" },
+    { name:"Artemis Xie", rating:1564, school:"PS 77", grade:"5" },
+    { name:"Harry Lai", rating:1564, school:"PS 77", grade:"5" },
+    { name:"Emma Leon", rating:1554, school:"PS 130M", grade:"5" },
+    { name:"Jonah Finkelstein", rating:1520, school:"PS 130", grade:"5" },
+    { name:"Atsumu Nomura", rating:1511, school:"PS 39", grade:"5" },
+    { name:"Evan Lu", rating:1482, school:"PS 281", grade:"5" },
+    { name:"Sahil Gandhi", rating:1469, school:"PS 33", grade:"5" },
+    { name:"Alice Sirinides", rating:1458, school:"PS 130", grade:"5" },
+    { name:"Nikolas Garces", rating:1425, school:"PS 281", grade:"5" },
+    { name:"Henry Gu", rating:1400, school:"Nest+M", grade:"5" },
+    { name:"Ella Ho", rating:1394, school:"PS 33", grade:"5" },
+    { name:"Brandon Tsay", rating:1380, school:"PS 116", grade:"5" },
+    { name:"Ryland Larsen", rating:1366, school:"PS 198", grade:"5" },
+    { name:"Javier Carcamo", rating:1363, school:"PS 282", grade:"5" },
+    { name:"Alexander Danford", rating:1362, school:"PS 77", grade:"5" },
+    { name:"Thaiger DeRosa", rating:1360, school:"BASIS-B", grade:"5" },
+    { name:"Holden Sebold", rating:1338, school:"PS 10", grade:"5" },
+    { name:"Sloane Murphy", rating:1311, school:"PS 11", grade:"5" },
+    { name:"Aiden Kuc", rating:1294, school:"PS 130", grade:"5" },
+    { name:"Isha Varma", rating:1291, school:"PS 11", grade:"5" },
+    { name:"Nia Zheng", rating:1287, school:"PS 130M", grade:"5" },
+    { name:"Walter Gooch-Raushenbush", rating:1279, school:"PS 11", grade:"5" },
+    { name:"Ayden Pan", rating:1279, school:"PS 130M", grade:"5" },
+    { name:"Evan Lam", rating:1277, school:"PS 124", grade:"5" },
+    { name:"Russell Cinquegrana", rating:1268, school:"Nest+M", grade:"5" },
+    { name:"Xavier Lazaro", rating:1256, school:"PS 230", grade:"5" },
+    { name:"Kevin Purcell", rating:1232, school:"PS 166", grade:"5" },
+    { name:"Finley Chamberlain", rating:1231, school:"PS 282", grade:"5" },
+    { name:"Zoe Thompson", rating:1229, school:"PS 31", grade:"5" },
+    { name:"Mahir Maturu", rating:1225, school:"PS 39", grade:"5" },
+    { name:"Cyrus Christoff", rating:1224, school:"PS 230", grade:"5" },
+    { name:"Mariam Kuruvilla", rating:1216, school:"PS 77", grade:"5" },
+    { name:"Boran Richter", rating:1216, school:"PS 39", grade:"5" },
+    { name:"Guy Gourvitch", rating:1204, school:"Nest+M", grade:"5" },
+    { name:"Aris Hampton", rating:1169, school:"PS 59", grade:"5" },
+  ];
+
+  const GRADES = [
+    { key: "K", label: "Kindergarten" },
+    { key: "1", label: "1st Grade" },
+    { key: "2", label: "2nd Grade" },
+    { key: "3", label: "3rd Grade" },
+    { key: "4", label: "4th Grade" },
+    { key: "5", label: "5th Grade" }
+  ];
+
+  const PLAYERS_BY_SCHOOL = ALL_PLAYERS.reduce((acc, p) => {
+    (acc[p.school] = acc[p.school] || []).push(p);
+    return acc;
+  }, {});
+
+  const PLAYERS_BY_GRADE = ALL_PLAYERS.reduce((acc, p) => {
+    (acc[p.grade] = acc[p.grade] || []).push(p);
+    return acc;
+  }, {});
+  Object.values(PLAYERS_BY_GRADE).forEach(list => list.sort((a, b) => b.rating - a.rating));
+
+  let currentView = "teams";
+  let currentRegionIndex = 0;
+  let currentDivisionKey = "k1";
+  let currentGrade = "K";
+  let expandedSchool = null;
+  let playerFilterGrade = "all";
+  let shineSchool = null;
+
+  function sortedSchools(list){
+    return [...list].sort((a, b) => b.points - a.points || a.name.localeCompare(b.name));
+  }
+
+  function deltaFor(school){
+    const prev = school.prevPoints !== undefined ? school.prevPoints : school.points;
+    return school.points - prev;
+  }
+
+  function topPlayers(schoolName, gradeFilter, eligibleGrades){
+    let roster = PLAYERS_BY_SCHOOL[schoolName];
+    if(!roster || !roster.length) return [];
+    if(gradeFilter && gradeFilter !== "all") roster = roster.filter(p => p.grade === gradeFilter);
+    else if(eligibleGrades) roster = roster.filter(p => eligibleGrades.includes(p.grade));
+    return [...roster].sort((a, b) => b.rating - a.rating).slice(0, 5);
+  }
+
+  function renderRegionTabs(){
+    const el = document.getElementById("region-tabs");
+    el.innerHTML = "";
+    LEAGUE_DATA.regions.forEach((region, i) => {
+      const btn = document.createElement("button");
+      btn.className = "tab" + (i === currentRegionIndex ? " active" : "");
+      btn.textContent = region.label;
+      btn.addEventListener("click", () => { currentRegionIndex = i; expandedSchool = null; render(); });
+      el.appendChild(btn);
+    });
+  }
+
+  function renderDivisionTabs(){
+    const el = document.getElementById("division-tabs");
+    el.innerHTML = "";
+    DIVISIONS.forEach(div => {
+      const btn = document.createElement("button");
+      btn.className = "tab small" + (div.key === currentDivisionKey ? " active" : "");
+      btn.textContent = div.label;
+      btn.addEventListener("click", () => { currentDivisionKey = div.key; expandedSchool = null; render(); });
+      el.appendChild(btn);
+    });
+  }
+
+  function trendHtml(delta){
+    if(delta > 0) return `<span class="trend up">&#9650; +${delta}</span>`;
+    if(delta < 0) return `<span class="trend down">&#9660; &minus;${Math.abs(delta)}</span>`;
+    return `<span class="trend flat">&mdash;</span>`;
+  }
+
+  function gradeChipLabel(g){ return g === "K" ? "K" : g; }
+
+  function playerPanelHtml(schoolName){
+    const fullRoster = PLAYERS_BY_SCHOOL[schoolName];
+
+    if(!fullRoster || !fullRoster.length){
+      return `<div class="player-empty">No USCF ratings on file yet for ${schoolName}.</div>`;
+    }
+
+    const section = DIVISIONS.find(d => d.key === currentDivisionKey);
+    const availableGrades = GRADES.filter(g =>
+      section.eligibleGrades.includes(g.key) && fullRoster.some(p => p.grade === g.key)
+    );
+    const chips = ["all", ...availableGrades.map(g => g.key)].map(g => `
+      <button type="button" class="filter-chip${playerFilterGrade === g ? " active" : ""}" data-grade="${g}">
+        ${g === "all" ? "All eligible" : gradeChipLabel(g)}
+      </button>
+    `).join("");
+
+    const players = topPlayers(schoolName, playerFilterGrade, section.eligibleGrades);
+    const emptyMsg = playerFilterGrade === "all"
+      ? `No ${section.label} (${section.shortLabel})-eligible players from this school in the top 50.`
+      : `No players from this school in that grade&rsquo;s top 50.`;
+    const rows = players.length ? players.map((p, i) => `
+      <div class="player-row">
+        <span class="player-rank num">${i + 1}</span>
+        <span class="player-name">${p.name}</span>
+        <span class="player-grade">${p.grade === "K" ? "K" : "Gr " + p.grade}</span>
+        <span class="player-rating">${p.rating}</span>
+      </div>
+    `).join("") : `<div class="player-empty">${emptyMsg}</div>`;
+
+    return `
+      <div class="filter-chips">${chips}</div>
+      <div class="player-panel-head">Top ${players.length} by USCF rating${playerFilterGrade !== "all" ? " &middot; " + GRADES.find(g => g.key === playerFilterGrade).label : " &middot; " + section.label + " eligible"}</div>
+      ${rows}
+    `;
+  }
+
+  function rankRowHtml(rankIndex, school, leaderPoints){
+    const medal = rankIndex === 1 ? "g" : rankIndex === 2 ? "s" : rankIndex === 3 ? "b" : null;
+    const shineClass = (medal && shineSchool === school.name) ? " shine" : "";
+    const rankHtml = medal
+      ? `<span class="medal ${medal}${shineClass}">${rankIndex}</span>`
+      : `<span class="rank-plain">${rankIndex}</span>`;
+    const pct = leaderPoints ? Math.round((school.points / leaderPoints) * 100) : 0;
+    const behindHtml = rankIndex === 1
+      ? `<span class="behind is-leader">Leader</span>`
+      : `<span class="behind">&minus;${leaderPoints - school.points}</span>`;
+    const isExpanded = expandedSchool === school.name;
+    const colors = SCHOOL_COLORS[school.name];
+    const logoPath = SCHOOL_LOGOS[school.name];
+    const markHtml = logoPath
+      ? `<span class="team-logo"><img src="${logoPath}" alt="" loading="lazy"></span>`
+      : colors
+        ? `<span class="team-swatch" style="background:linear-gradient(to right, ${colors[0]} 50%, ${colors[1]} 50%)"></span>`
+        : "";
+    const barStyle = colors
+      ? `width:${pct}%; background:linear-gradient(to bottom, ${colors[0]} 50%, ${colors[1]} 50%); border:1px solid var(--ink);`
+      : `width:${pct}%;`;
+    const rowTint = (medal && colors)
+      ? `linear-gradient(to right, color-mix(in srgb, ${colors[0]} 25%, white), color-mix(in srgb, ${colors[1]} 25%, white))`
+      : null;
+
+    const row = document.createElement("div");
+    row.className = "ladder-row" + (rankIndex === 1 ? " leader" : "") + (isExpanded ? " expanded" : "");
+    row.setAttribute("role", "button");
+    row.setAttribute("tabindex", "0");
+    row.setAttribute("aria-expanded", String(isExpanded));
+    if(rowTint) row.style.background = rowTint;
+    row.innerHTML = `
+      <span class="rank-cell">${rankHtml}</span>
+      <span class="school-cell">
+        <span class="chevron">&#9656;</span>
+        ${markHtml}
+        <span class="school-name">${school.name}</span>
+      </span>
+      <span class="bar-track"><span class="bar-fill" style="${barStyle}"></span></span>
+      <span class="val num">${school.points.toLocaleString()}</span>
+      ${trendHtml(deltaFor(school))}
+      ${behindHtml}
+    `;
+    const toggle = () => {
+      expandedSchool = isExpanded ? null : school.name;
+      playerFilterGrade = "all";
+      shineSchool = school.name;
+      renderBoard();
+      shineSchool = null;
+    };
+    row.addEventListener("click", toggle);
+    row.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); }
+    });
+    return row;
+  }
+
+  function renderBoard(){
+    const region = LEAGUE_DATA.regions[currentRegionIndex];
+    const section = DIVISIONS.find(d => d.key === currentDivisionKey);
+    const schools = sortedSchools(region.divisions[currentDivisionKey] || []);
+    const leaderPoints = schools.length ? schools[0].points : 0;
+
+    document.getElementById("board-title").textContent = `${region.label} — ${section.label}`;
+    document.getElementById("board-sub").textContent =
+      `${section.shortLabel} · ${schools.length} school${schools.length === 1 ? "" : "s"}`;
+
+    const crestBorough = CREST_BOROUGHS.find(b => b.key === region.key);
+    const crestDivision = CREST_DIVISIONS.find(d => d.key === currentDivisionKey);
+    document.getElementById("board-crest").innerHTML =
+      (crestBorough && crestDivision) ? buildCrestSVG(crestBorough, crestDivision) : "";
+    document.getElementById("card-foot-right").textContent =
+      region.key === "overall" ? "Boroughs shown separately as regions" : "Top 10 shown for this borough";
+
+    const body = document.getElementById("ladder-body");
+    body.innerHTML = "";
+    schools.forEach((school, i) => {
+      const rankIndex = i + 1;
+      body.appendChild(rankRowHtml(rankIndex, school, leaderPoints));
+      if(expandedSchool === school.name){
+        const panel = document.createElement("div");
+        panel.className = "player-panel";
+        panel.innerHTML = playerPanelHtml(school.name);
+        panel.querySelectorAll(".filter-chip").forEach(chip => {
+          chip.addEventListener("click", () => {
+            playerFilterGrade = chip.dataset.grade;
+            renderBoard();
+          });
+        });
+        body.appendChild(panel);
+      }
+      if(rankIndex === 10 && schools.length > 10){
+        const div = document.createElement("div");
+        div.className = "cutoff";
+        div.innerHTML = `<span>Top 10</span>`;
+        body.appendChild(div);
+      }
+    });
+  }
+
+  function renderLeaders(){
+    const region = LEAGUE_DATA.regions[currentRegionIndex];
+    const el = document.getElementById("leaders");
+    el.innerHTML = "";
+    DIVISIONS.forEach(div => {
+      const schools = sortedSchools(region.divisions[div.key] || []);
+      if(!schools.length) return;
+      const leader = schools[0];
+      const row = document.createElement("div");
+      row.className = "leader-row";
+      row.innerHTML = `
+        <span class="division-tag">${div.label}</span>
+        <span class="lb-name">${leader.name}</span>
+        <span class="lb-pts">${leader.points.toLocaleString()}</span>
+      `;
+      el.appendChild(row);
+    });
+  }
+
+  function renderViewToggle(){
+    document.querySelectorAll("#view-toggle button").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.view === currentView);
+    });
+    document.getElementById("team-view").style.display = currentView === "teams" ? "" : "none";
+    document.getElementById("player-view").style.display = currentView === "players" ? "" : "none";
+    document.getElementById("leaders-teams-card").style.display = currentView === "teams" ? "" : "none";
+    document.getElementById("leaders-players-card").style.display = currentView === "players" ? "" : "none";
+  }
+
+  function renderGradeTabs(){
+    const el = document.getElementById("grade-tabs");
+    el.innerHTML = "";
+    GRADES.forEach(g => {
+      const btn = document.createElement("button");
+      btn.className = "tab small" + (g.key === currentGrade ? " active" : "");
+      btn.textContent = g.label;
+      btn.addEventListener("click", () => { currentGrade = g.key; render(); });
+      el.appendChild(btn);
+    });
+  }
+
+  function playerRowHtml(rankIndex, player, leaderRating){
+    const medal = rankIndex === 1 ? "g" : rankIndex === 2 ? "s" : rankIndex === 3 ? "b" : null;
+    const rankHtml = medal
+      ? `<span class="medal ${medal}">${rankIndex}</span>`
+      : `<span class="rank-plain">${rankIndex}</span>`;
+    const behindHtml = rankIndex === 1
+      ? `<span class="behind is-leader">Leader</span>`
+      : `<span class="behind">&minus;${leaderRating - player.rating}</span>`;
+    const colors = SCHOOL_COLORS[player.school];
+    const rowTint = (medal && colors)
+      ? `linear-gradient(to right, color-mix(in srgb, ${colors[0]} 25%, white), color-mix(in srgb, ${colors[1]} 25%, white))`
+      : null;
+
+    const row = document.createElement("div");
+    row.className = "ladder-row plist-row" + (rankIndex === 1 ? " leader" : "");
+    if(rowTint) row.style.background = rowTint;
+    row.innerHTML = `
+      <span class="rank-cell">${rankHtml}</span>
+      <span class="player-cell">
+        <span class="school-name">${player.name}</span>
+        <span class="school-sub">${player.school}</span>
+      </span>
+      <span class="val num">${player.rating}</span>
+      ${behindHtml}
+    `;
+    return row;
+  }
+
+  function renderPlayerBoard(){
+    const gradeLabel = GRADES.find(g => g.key === currentGrade).label;
+    const players = PLAYERS_BY_GRADE[currentGrade] || [];
+    const leaderRating = players.length ? players[0].rating : 0;
+
+    document.getElementById("player-board-title").textContent = `${gradeLabel} — Top 50`;
+    document.getElementById("player-board-sub").textContent = `${players.length} players`;
+
+    const body = document.getElementById("player-body");
+    body.innerHTML = "";
+    players.forEach((p, i) => body.appendChild(playerRowHtml(i + 1, p, leaderRating)));
+  }
+
+  function renderGradeLeaders(){
+    const el = document.getElementById("grade-leaders");
+    el.innerHTML = "";
+    GRADES.forEach(g => {
+      const players = PLAYERS_BY_GRADE[g.key] || [];
+      if(!players.length) return;
+      const leader = players[0];
+      const row = document.createElement("div");
+      row.className = "leader-row";
+      row.innerHTML = `
+        <span class="division-tag">${g.key === "K" ? "K" : "Gr " + g.key}</span>
+        <span class="lb-name">${leader.name}<span class="lb-sub">${leader.school}</span></span>
+        <span class="lb-pts">${leader.rating}</span>
+      `;
+      el.appendChild(row);
+    });
+  }
+
+  document.querySelectorAll("#view-toggle button").forEach(btn => {
+    btn.addEventListener("click", () => { currentView = btn.dataset.view; render(); });
+  });
+
+  /* ============================================================
+     Division crests — one per borough x grade division. Piece marks
+     the division (pawn/knight/rook), ring color marks the borough.
+     Fixed hex colors (not theme tokens): the crest plate is always
+     cream, on-brand in both light and dark page themes.
+     ============================================================ */
+  const BOROUGH_PIECES = { k1: "♟", primary: "♞", elementary: "♜" };
+  const OVERALL_PIECES = { k1: "♝", primary: "♛", elementary: "♚" };
+
+  const CREST_BOROUGHS = [
+    { key: "overall", label: "Overall", pieces: OVERALL_PIECES },
+    { key: "manhattan", label: "Manhattan", pieces: BOROUGH_PIECES },
+    { key: "brooklyn", label: "Brooklyn", pieces: BOROUGH_PIECES }
+  ];
+  const CREST_DIVISIONS = [
+    { key: "k1", label: "K–1" },
+    { key: "primary", label: "Primary" },
+    { key: "elementary", label: "Elementary" }
+  ];
+
+  /* Monochrome crest: a checkerboard ring (echoing the board itself)
+     around a plain plate, with the piece and arced borough/division
+     labels in ink. Fixed hex colors — these render standalone as
+     exported PNGs too, outside any page theme. */
+  function buildCrestSVG(borough, division){
+    const uid = `${borough.key}-${division.key}`;
+    const cx = 120, cy = 120, rOuter = 108, rInner = 90, rArc = 74;
+    const ink = "#161513", plate = "#fdfcf8";
+    const topId = `arcTop-${uid}`, bottomId = `arcBottom-${uid}`, chkId = `chk-${uid}`;
+    return `
+      <svg viewBox="0 0 240 240" role="img" aria-label="${borough.label} ${division.label} crest">
+        <defs>
+          <pattern id="${chkId}" width="12" height="12" patternUnits="userSpaceOnUse">
+            <rect width="12" height="12" fill="#ffffff"/>
+            <rect width="6" height="6" fill="${ink}"/>
+            <rect x="6" y="6" width="6" height="6" fill="${ink}"/>
+          </pattern>
+          <path id="${topId}" d="M ${cx - rArc} ${cy} A ${rArc} ${rArc} 0 1 1 ${cx + rArc} ${cy}" fill="none"/>
+          <path id="${bottomId}" d="M ${cx - rArc} ${cy} A ${rArc} ${rArc} 0 1 0 ${cx + rArc} ${cy}" fill="none"/>
+        </defs>
+        <circle cx="${cx}" cy="${cy}" r="${rInner}" fill="${plate}"/>
+        <path
+          d="M ${cx - rOuter} ${cy} a ${rOuter} ${rOuter} 0 1 0 ${2 * rOuter} 0 a ${rOuter} ${rOuter} 0 1 0 ${-2 * rOuter} 0 Z
+             M ${cx - rInner} ${cy} a ${rInner} ${rInner} 0 1 0 ${2 * rInner} 0 a ${rInner} ${rInner} 0 1 0 ${-2 * rInner} 0 Z"
+          fill="url(#${chkId})" fill-rule="evenodd"/>
+        <circle cx="${cx}" cy="${cy}" r="${rOuter}" fill="none" stroke="${ink}" stroke-width="1.5"/>
+        <circle cx="${cx}" cy="${cy}" r="${rInner}" fill="none" stroke="${ink}" stroke-width="1"/>
+        <text font-family="Libre Caslon Display, Georgia, serif" font-size="86" text-anchor="middle" fill="${ink}">
+          <tspan x="${cx}" y="${cy + 29}">${borough.pieces[division.key]}</tspan>
+        </text>
+        <text font-family="Oswald, sans-serif" font-size="14" font-weight="600" letter-spacing="2.5" fill="${ink}">
+          <textPath href="#${topId}" startOffset="50%" text-anchor="middle">${borough.label.toUpperCase()}</textPath>
+        </text>
+        <text font-family="Oswald, sans-serif" font-size="12.5" font-weight="600" letter-spacing="2" fill="${ink}">
+          <textPath href="#${bottomId}" startOffset="50%" text-anchor="middle">${division.label.toUpperCase()}</textPath>
+        </text>
+      </svg>`;
+  }
+
+  function renderBadges(){
+    const grid = document.getElementById("badge-grid");
+    if(!grid) return;
+    grid.innerHTML = "";
+    CREST_BOROUGHS.forEach(borough => {
+      CREST_DIVISIONS.forEach(division => {
+        const card = document.createElement("div");
+        card.className = "badge-card";
+        card.innerHTML = `
+          ${buildCrestSVG(borough, division)}
+          <div class="badge-caption">
+            <span class="badge-borough">${borough.label}</span>
+            <span class="badge-division">${division.label}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    });
+  }
+
+  function render(){
+    renderViewToggle();
+    renderRegionTabs();
+    renderDivisionTabs();
+    renderBoard();
+    renderLeaders();
+    renderGradeTabs();
+    renderPlayerBoard();
+    renderGradeLeaders();
+  }
+
+  render();
+  renderBadges();
+</script>
+</body>
+</html>
