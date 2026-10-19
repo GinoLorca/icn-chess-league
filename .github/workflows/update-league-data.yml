@@ -1,9 +1,10 @@
 name: Update league data
 
+# PAUSED: the daily schedule is switched off (see README "Project status").
+# To reactivate, restore these two lines under `on:`:
+#   schedule:
+#     - cron: "23 9 * * *"
 on:
-  schedule:
-    # Daily at 09:23 UTC (~5:23am ET) -- off an exact hour mark on purpose.
-    - cron: "23 9 * * *"
   workflow_dispatch: {}
 
 permissions:

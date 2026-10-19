@@ -7,6 +7,29 @@ backend, no dependencies beyond two Google Fonts stylesheets.
 Live on GitHub Pages at **https://ginolorca.github.io/icn-chess-league/**,
 embedded on impactcoachingnetwork.org via an iframe (see below).
 
+## Project status: paused (October 2026)
+
+ICN went with an in-house version of the league page, so this project is
+on hold. Nothing has been deleted — the daily auto-update schedule is just
+switched off, so no workflow runs (or failure emails) happen. The page
+still shows the last data it pulled (October 15, 2026).
+
+The scraper started failing on October 16, 2026, most likely because the
+source page (`https://icnadmin.com/League2026.html`) changed or moved when
+ICN switched over. That wasn't investigated before pausing.
+
+**To reactivate:**
+
+1. Check the source URL still works. If ICN moved it (for example to a new
+   season's `League2027.html`), update `SOURCE_URL` in
+   `scripts/update_league_data.py`.
+2. Run it once by hand: **Actions → Update league data → Run workflow**.
+   If it fails, the source page's HTML probably changed and the regexes in
+   the script need updating to match.
+3. Once a manual run succeeds, restore the daily schedule in
+   `.github/workflows/update-league-data.yml` (the two lines to put back
+   are in a comment at the top of that file).
+
 ## Updating the league
 
 **Standings and player data update themselves.** A scheduled GitHub Actions
